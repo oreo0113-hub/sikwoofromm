@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SikWoo Fromm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+/* ============================================================
+   PHẦN CẬU CẦN SỬA — chỉ sửa chữ nằm trong dấu ngoặc kép " "
+   ============================================================ */
+const CAI_DAT = {
+  // Tên nhóm hiện trên đầu trang
+  tenNhom: "식우집",
+
+  // Dòng chào ở đầu mỗi ngày
+  loiChao: "KIM YOON SIK & PARK SIWOO\nChào mừng đến phòng chat bí mật!",
+
+  // Link Google Sheet đã "Xuất bản lên web" dạng CSV.
+  // Để trống "" thì web hiện tin mẫu.
+  linkSheet: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqCsEuAZmcHM4R7lYn2HXtlocmp1llu8WjiSErmnow3NqIpMkHZA2WAFGq104lOQ_1DBHkOIyq9VuH/pub?output=csv",
+
+  // Tên hiển thị và ảnh đại diện (link ảnh Drive hoặc link ảnh bất kỳ).
+  // Để trống "" thì hiện chữ cái đầu.
+  yoonsik: { ten: "김윤식", tenViet: "Yoonsik", anh: "" },
+  syu:     { ten: "박시우", tenViet: "Syu",     anh: "" },
+
+  // Giờ hiển thị kiểu Fromm "PM 4:40" (true) hay "16:40" (false)
+  gioKieuFromm: true
+};
+/* ============================ HẾT PHẦN SỬA ============================ */
+</script>
+
+<style>
+:root{
+  --bg:#9db3c8; --bar:#9db3c8; --bar-line:rgba(255,255,255,.35);
+  --bubble:#ffffff; --ink:#1b2430; --ink-soft:#4a5666; --divider:#e3e8ee;
+  --meta:#33465c; --system:#7f97ad; --system-ink:#ffffff;
+  --live:#ef3b4a; --sheet:#ffffff; --sheet-ink:#1b2430; --chip:#eef2f6;
+  --ys:#3d6a99; --sy:#8a5a9c; --focus:#1f5fbf;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1e2a36; --bar:#1e2a36; --bar-line:rgba(255,255,255,.12);
+    --bubble:#2c3a48; --ink:#eef2f6; --ink-soft:#b6c2cf; --divider:#3d4c5c;
+    --meta:#9fb2c5; --system:#344555; --system-ink:#dfe7ef;
+    --sheet:#243240; --sheet-ink:#eef2f6; --chip:#2f3f4f;
+    --ys:#8fb7e3; --sy:#d0a6e0; --focus:#8fb7e3;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1e2a36; --bar:#1e2a36; --bar-line:rgba(255,255,255,.12);
+  --bubble:#2c3a48; --ink:#eef2f6; --ink-soft:#b6c2cf; --divider:#3d4c5c;
+  --meta:#9fb2c5; --system:#344555; --system-ink:#dfe7ef;
+  --sheet:#243240; --sheet-ink:#eef2f6; --chip:#2f3f4f;
+  --ys:#8fb7e3; --sy:#d0a6e0; --focus:#8fb7e3;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Noto Sans KR",system-ui,sans-serif;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bar);z-index:10}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Thanh trên */
+.top{flex:none;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;height:56px;padding:0 8px;background:var(--bar);border-bottom:1px solid var(--bar-line)}
+.title{justify-self:center;display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.25rem;letter-spacing:.01em}
+.live{background:var(--live);color:#fff;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.06em}
+.icon-btn{width:40px;height:40px;border:0;background:none;border-radius:10px;cursor:pointer;display:grid;place-items:center;font-size:1.3rem}
+.icon-btn:hover{background:rgba(255,255,255,.18)}
+
+/* Khung chat */
+main{flex:1;overflow-y:auto;overflow-x:hidden}
+.chat{max-width:640px;margin:0 auto;padding:20px 14px 28px}
+.system{margin:4px auto 22px;max-width:300px;background:var(--system);color:var(--system-ink);text-align:center;border-radius:16px;padding:12px 16px;font-size:.92rem;line-height:1.5;white-space:pre-line}
+.system.notice{max-width:420px;text-align:left;font-size:.88rem}
+body.hide-kr .system.notice{white-space:normal}
+.daypill{display:block;width:max-content;margin:0 auto 18px;background:rgba(0,0,0,.14);color:#fff;font-size:.8rem;padding:4px 12px;border-radius:999px}
+.msg{display:grid;grid-template-columns:48px 1fr;gap:10px;margin-bottom:14px}
+.msg.cont{margin-top:-8px}
+.msg.cont .avatar,.msg.cont .name{visibility:hidden;height:0}
+.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--chip);display:grid;place-items:center;font-weight:700;border:2px solid rgba(255,255,255,.7)}
+.ys .avatar{color:var(--ys)} .sy .avatar{color:var(--sy)}
+.name{font-size:.86rem;margin:2px 0 5px;color:var(--meta);font-family:"Noto Sans KR","Be Vietnam Pro",sans-serif}
+.row{display:flex;align-items:flex-end;gap:8px}
+.row+.row{margin-top:6px}
+.bubble{background:var(--bubble);border-radius:18px;padding:12px 16px;max-width:min(78vw,440px);line-height:1.5;overflow-wrap:anywhere}
+.kr{word-break:keep-all;font-family:"Noto Sans KR","Be Vietnam Pro",sans-serif;font-size:1.02rem}
+.vi{color:var(--ink-soft);font-size:.97rem}
+.kr+.vi{border-top:1px solid var(--divider);margin-top:9px;padding-top:9px}
+body.hide-kr .kr{display:none}
+body.hide-kr .kr+.vi{border:0;margin:0;padding:0;color:var(--ink)}
+.time{flex:none;font-size:.78rem;color:var(--meta);padding-bottom:2px}
+.media{background:var(--bubble);border-radius:18px;padding:8px;max-width:min(70vw,320px);display:grid;gap:6px}
+.media img{display:block;width:100%;border-radius:12px;cursor:zoom-in;background:var(--chip)}
+.media video,.media iframe{display:block;width:100%;aspect-ratio:9/16;border:0;border-radius:12px;background:#000}
+.stub{font-size:.88rem;color:var(--ink-soft);background:var(--bubble);opacity:.75;border:1px dashed var(--divider);border-radius:14px;padding:6px 12px}
+.note{font-size:.85rem;color:var(--ink-soft);padding:2px 4px}
+
+.empty{margin:60px auto;max-width:340px;text-align:center;background:var(--bubble);border-radius:18px;padding:22px;line-height:1.6}
+.empty strong{display:block;margin-bottom:6px}
+
+/* Thanh dưới */
+.bottom{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--sheet);color:var(--sheet-ink);border-top:1px solid var(--bar-line)}
+.bottom button{border:0;background:var(--chip);border-radius:10px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.bottom button:disabled{opacity:.35;cursor:default}
+.bottom input{border:1px solid var(--divider);background:var(--sheet);border-radius:10px;padding:7px 10px;min-width:0}
+
+/* Ngăn kéo menu */
+.drawer{position:fixed;inset:0;display:none;z-index:20}
+.drawer.open{display:block}
+.shade{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.panel{position:absolute;top:0;right:0;bottom:0;width:min(86vw,340px);background:var(--sheet);color:var(--sheet-ink);padding:calc(env(safe-area-inset-top,0px) + 16px) 18px 24px;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.2)}
+.panel h2{font-size:1.05rem;margin-bottom:12px}
+.panel h3{font-size:.85rem;color:var(--ink-soft);font-weight:500;margin:18px 0 8px}
+.switch{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider);cursor:pointer}
+.days{display:flex;flex-wrap:wrap;gap:6px}
+.days button{border:0;background:var(--chip);border-radius:9px;padding:6px 9px;cursor:pointer;font-size:.88rem}
+.days button[aria-current="true"]{background:var(--ys);color:#fff}
+
+dialog{border:0;background:rgba(0,0,0,.92);max-width:100vw;max-height:100vh;width:100vw;height:100vh;padding:0}
+dialog img{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%}
+dialog button{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:1;border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+
+@media (prefers-reduced-motion:no-preference){ .chat{animation:in .25s ease-out} @keyframes in{from{opacity:0;transform:translateY(6px)}} }
+</style>
+</head>
+<body>
+<header class="top">
+  <span></span>
+  <div class="title"><span id="group-name"></span><span class="live">LIVE</span></div>
+  <button class="icon-btn" id="open-menu" aria-label="Mở menu">≡</button>
+</header>
+
+<main id="scroller"><div class="chat" id="chat"></div></main>
+
+<nav class="bottom" aria-label="Chọn ngày">
+  <button id="prev">‹ Ngày trước</button>
+  <input type="date" id="picker" aria-label="Chọn ngày">
+  <button id="next">Ngày sau ›</button>
+</nav>
+
+<div class="drawer" id="drawer">
+  <div class="shade" id="shade"></div>
+  <aside class="panel" aria-label="Menu">
+    <h2>Cài đặt xem</h2>
+    <label class="switch">Hiện tiếng Hàn <input type="checkbox" id="show-kr" checked></label>
+    <label class="switch">Nền tối <input type="checkbox" id="dark"></label>
+    <div id="day-list"></div>
+  </aside>
+</div>
+
+<dialog id="viewer"><button id="close-viewer">Đóng ×</button><img id="viewer-img" alt=""></dialog>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+
+/* ---------- Tin mẫu (hiện khi chưa có link Sheet) ---------- */
+const MAU = [
+  ["2026-10-01","16:40","Yoonsik","6시땡아아","6 giờ đúng nèeee",""],
+  ["2026-10-01","17:00","Syu","똑똑","Cốc cốc",""],
+  ["2026-10-01","17:01","Yoonsik","박슈 아직 촬영중?ㅋㅋㅋ","Park Syu vẫn đang quay à? ㅋㅋㅋ",""],
+  ["2026-10-01","17:01","Syu","저 여기 들어오려고 알람까지 맞춰놨어요","Em còn đặt cả báo thức để vào đây đấy",""],
+  ["2026-10-01","17:01","Yoonsik","나도인데ㅋㅋㅋㅋㅋㅋㅋㅋㅋ","Anh cũng thếㅋㅋㅋㅋㅋㅋㅋㅋㅋ",""],
+  ["2026-10-01","17:02","Syu","ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ 역시","ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ quả nhiên",""],
+  ["2026-10-01","17:06","Syu","","","mau"],
+  ["2026-10-01","17:07","Yoonsik","아잉ㅋㅋㅋㅋ 자기만 잘나오고 내표정 왜저러냐.","Ơ kìaㅋㅋㅋㅋ mỗi em lên hình đẹp, còn mặt anh sao thế kia.",""],
+  ["2026-10-01","17:08","Syu","귀여운데 왜에~ 안 그래요 여러분?","Dễ thương mà sao đâu~ Mọi người thấy đúng không?",""],
+  ["2026-10-01","17:09","Yoonsik","ㅋㅋㅋㅋㅋ멋진거 많은데ㅋㅋㅋㅋ 귀엽다니 넘어가드림","ㅋㅋㅋㅋㅋ ảnh ngầu thiếu gìㅋㅋㅋㅋ nhưng em bảo dễ thương thì anh cho qua",""]
+].map(([ngay,gio,nguoi,han,viet,anh]) => ({ngay,gio,nguoi,han,viet,anh,video:""}));
+const ANH_MAU = "data:image/svg+xml;utf8," + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400"><rect width="300" height="400" fill="#dfe6ee"/><text x="150" y="205" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#6b7d90">Ảnh mẫu</text></svg>');
+
+/* ---------- Đọc CSV ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], cell="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+    else if(c=='"') q=true;
+    else if(c==','){ row.push(cell); cell=""; }
+    else if(c=='\n'||c=='\r'){ if(c=='\r'&&text[i+1]=='\n') i++; row.push(cell); rows.push(row); row=[]; cell=""; }
+    else cell+=c;
+  }
+  if(cell||row.length){ row.push(cell); rows.push(row); }
+  return rows;
+}
+const strip = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").toLowerCase().trim();
+function toObjects(rows){
+  const head = rows.shift().map(strip);
+  const idx = k => head.findIndex(h => new RegExp("\\b"+k).test(h));
+  const pick = { ngay:idx("ngay"), gio:idx("gio"), nguoi:idx("nguoi"), han:idx("han"), viet:idx("viet"), anh:idx("anh"), video:idx("video") };
+  return rows.filter(r => r.some(x=>x.trim())).map(r => {
+    const o={}; for(const k in pick) o[k] = pick[k]>=0 ? (r[pick[k]]||"").trim().replace(/^'/,"") : ""; return o;
+  });
+}
+
+/* ---------- Chuẩn hoá ngày, giờ, người ---------- */
+function normDate(s){
+  s=(s||"").trim(); let m;
+  if(m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/)) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  if(m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/)) return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  if(m=s.match(/^(\d{2})(\d{2})(\d{2})$/)) return `20${m[1]}-${m[2]}-${m[3]}`;
+  return "";
+}
+function normTime(s){
+  s=(s||"").trim(); const m=s.match(/(\d{1,2})[:h.](\d{2})/); if(!m) return "";
+  let h=+m[1]; const pm=/pm|ch|오후/i.test(s), am=/am|sa|오전/i.test(s);
+  if(pm&&h<12) h+=12; if(am&&h==12) h=0;
+  return `${String(h).padStart(2,"0")}:${m[2]}`;
+}
+function who(s){
+  const t=strip(s);
+  if(/fromm|thong bao|he thong/.test(t)) return "sys";
+  if(/syu|siwoo|시우|슈|박/.test(t)) return "sy";
+  if(/yoon|sik|윤식|식|ys|김/.test(t)) return "ys";
+  return "";
+}
+function showTime(t){
+  if(!t) return "";
+  if(!CAI_DAT.gioKieuFromm) return t;
+  let [h,m]=t.split(":").map(Number); const ap=h<12?"AM":"PM"; h=h%12||12;
+  return `${ap} ${h}:${String(m).padStart(2,"0")}`;
+}
+
+/* ---------- Link ảnh / video ---------- */
+const driveId = u => (u.match(/\/d\/([\w-]{20,})/)||u.match(/[?&]id=([\w-]{20,})/)||[])[1];
+const links = s => (s||"").split(/[\s,]+/).filter(x=>/^(https?:|data:)/.test(x) || x=="mau");
+function imgSrc(u){ if(u=="mau") return ANH_MAU; const id=driveId(u); return id?`https://drive.google.com/thumbnail?id=${id}&sz=w1200`:u; }
+function videoEl(u){
+  const id=driveId(u);
+  if(id){ const f=document.createElement("iframe"); f.src=`https://drive.google.com/file/d/${id}/preview`; f.allow="autoplay; fullscreen"; f.loading="lazy"; f.title="Video"; return f; }
+  const v=document.createElement("video"); v.src=u; v.controls=true; v.playsInline=true; v.preload="metadata"; return v;
+}
+
+/* ---------- Dữ liệu & hiển thị ---------- */
+let MSGS=[], DAYS=[], current="";
+const fmtDay = d => new Date(d+"T00:00:00").toLocaleDateString("vi-VN",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
+
+function avatar(p){
+  const info = p=="ys"?CAI_DAT.yoonsik:CAI_DAT.syu;
+  if(info.anh){ const i=document.createElement("img"); i.className="avatar"; i.src=imgSrc(info.anh); i.alt=info.tenViet; return i; }
+  const d=document.createElement("div"); d.className="avatar"; d.textContent=info.tenViet[0]; d.setAttribute("aria-hidden","true"); return d;
+}
+
+function render(){
+  const chat=$("chat"); chat.innerHTML="";
+  if(!DAYS.length){ chat.innerHTML='<div class="empty"><strong>Chưa có tin nào</strong>Thêm dòng đầu tiên vào Google Sheet, chờ vài phút rồi tải lại trang.</div>'; return; }
+  const sys=document.createElement("div"); sys.className="system"; sys.textContent=CAI_DAT.loiChao; chat.append(sys);
+  const pill=document.createElement("span"); pill.className="daypill"; pill.textContent=fmtDay(current); chat.append(pill);
+  let last="";
+  for(const m of MSGS.filter(x=>x.ngay==current)){
+    if(m.p=="sys"){ const n=document.createElement("div"); n.className="system notice"; n.textContent=(m.han?m.han+"\n\n":"")+m.viet; chat.append(n); last=""; continue; }
+    const box=document.createElement("div"); box.className=`msg ${m.p}` + (m.p==last?" cont":""); last=m.p;
+    const info=m.p=="ys"?CAI_DAT.yoonsik:CAI_DAT.syu;
+    const right=document.createElement("div");
+    const name=document.createElement("p"); name.className="name"; name.textContent=info.ten; right.append(name);
+    const add = el => { const row=document.createElement("div"); row.className="row"; const t=document.createElement("span"); t.className="time"; t.textContent=showTime(m.gio); row.append(el,t); right.append(row); };
+    const placeholder = !m.han && /^(📎|🎙|⚠|\(.*sticker)/.test(m.viet);
+    if(placeholder && !links(m.anh).length && !links(m.video).length){
+      const n=document.createElement("div"); n.className="stub"; n.textContent=m.viet; add(n);
+    } else if((m.han||m.viet) && !placeholder){
+      const b=document.createElement("div"); b.className="bubble";
+      if(m.han){ const k=document.createElement("div"); k.className="kr"; k.lang="ko"; k.textContent=m.han; b.append(k); }
+      if(m.viet){ const v=document.createElement("div"); v.className="vi"; v.textContent=m.viet; b.append(v); }
+      add(b);
+    }
+    const imgs=links(m.anh), vids=links(m.video);
+    if(imgs.length||vids.length){
+      const md=document.createElement("div"); md.className="media";
+      imgs.forEach(u=>{ const i=document.createElement("img"); i.src=imgSrc(u); i.loading="lazy"; i.alt=`Ảnh ${info.tenViet} gửi`; i.onclick=()=>openViewer(i.src); i.onerror=()=>{ i.replaceWith(Object.assign(document.createElement("p"),{className:"note",textContent:"Ảnh chưa mở quyền xem trên Drive."})); }; md.append(i); });
+      vids.forEach(u=>md.append(videoEl(u)));
+      add(md);
+    }
+    box.append(avatar(m.p), right); chat.append(box);
+  }
+  const i=DAYS.indexOf(current);
+  $("prev").disabled = i<=0; $("next").disabled = i>=DAYS.length-1;
+  $("picker").value=current; $("picker").min=DAYS[0]; $("picker").max=DAYS[DAYS.length-1];
+  document.querySelectorAll(".days button").forEach(b=>b.setAttribute("aria-current", b.dataset.d==current));
+  $("scroller").scrollTop=0;
+  try{ history.replaceState(null,"","#"+current.replace(/-/g,"").slice(2)); }catch(e){}
+}
+
+function buildDayList(){
+  const box=$("day-list"); box.innerHTML="";
+  const byMonth={}; DAYS.forEach(d=>(byMonth[d.slice(0,7)] ||= []).push(d));
+  Object.keys(byMonth).sort().reverse().forEach(mo=>{
+    const h=document.createElement("h3"); const [y,mm]=mo.split("-"); h.textContent=`Tháng ${+mm}/${y}`; box.append(h);
+    const wrap=document.createElement("div"); wrap.className="days";
+    byMonth[mo].forEach(d=>{ const b=document.createElement("button"); b.dataset.d=d; b.textContent=`${+d.slice(8)}/${+d.slice(5,7)}`; b.onclick=()=>{ go(d); closeMenu(); }; wrap.append(b); });
+    box.append(wrap);
+  });
+}
+
+function go(d){
+  if(!DAYS.includes(d)){ d = DAYS.find(x=>x>=d) || DAYS[DAYS.length-1]; }
+  current=d; render();
+}
+
+function load(list){
+  MSGS = list.map(o=>({...o, ngay:normDate(o.ngay), gio:normTime(o.gio), p:who(o.nguoi)}))
+             .filter(o=>o.ngay && o.p)
+             .map((o,i)=>({...o,i}))
+             .sort((a,b)=>(a.ngay+a.gio).localeCompare(b.ngay+b.gio) || a.i-b.i);
+  DAYS=[...new Set(MSGS.map(m=>m.ngay))].sort();
+  buildDayList();
+  const h=location.hash.slice(1); const fromHash=normDate(h);
+  current = DAYS.includes(fromHash) ? fromHash : DAYS[DAYS.length-1] || "";
+  render();
+}
+
+/* ---------- Menu, nút, xem ảnh ---------- */
+const openMenu=()=>$("drawer").classList.add("open"), closeMenu=()=>$("drawer").classList.remove("open");
+$("open-menu").onclick=openMenu; $("shade").onclick=closeMenu;
+document.addEventListener("keydown",e=>{ if(e.key=="Escape") closeMenu(); });
+$("prev").onclick=()=>go(DAYS[DAYS.indexOf(current)-1]);
+$("next").onclick=()=>go(DAYS[DAYS.indexOf(current)+1]);
+$("picker").onchange=e=>e.target.value&&go(e.target.value);
+function openViewer(src){ $("viewer-img").src=src; $("viewer").showModal(); }
+$("close-viewer").onclick=()=>$("viewer").close();
+$("viewer").onclick=e=>{ if(e.target.id=="viewer") $("viewer").close(); };
+
+function pref(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){} }
+$("show-kr").checked = pref("kr")!=="0";
+document.body.classList.toggle("hide-kr", !$("show-kr").checked);
+$("show-kr").onchange=e=>{ document.body.classList.toggle("hide-kr",!e.target.checked); pref("kr",e.target.checked?"1":"0"); };
+const savedTheme=pref("theme");
+if(savedTheme) document.documentElement.dataset.theme=savedTheme;
+$("dark").checked = savedTheme ? savedTheme=="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+$("dark").onchange=e=>{ const t=e.target.checked?"dark":"light"; document.documentElement.dataset.theme=t; pref("theme",t); };
+
+$("group-name").textContent=CAI_DAT.tenNhom; document.title=CAI_DAT.tenNhom+" · Fromm";
+
+if(!CAI_DAT.linkSheet){ load(MAU); }
+else{
+  $("chat").innerHTML='<div class="empty">Đang tải tin nhắn…</div>';
+  fetch(CAI_DAT.linkSheet+(CAI_DAT.linkSheet.includes("?")?"&":"?")+"t="+Date.now())
+    .then(r=>{ if(!r.ok) throw 0; return r.text(); })
+    .then(t=>{ if(/^\s*</.test(t)) throw 0; load(toObjects(parseCSV(t))); })
+    .catch(()=>{ $("chat").innerHTML='<div class="empty"><strong>Không đọc được Google Sheet</strong>Kiểm tra lại: Sheet đã "Xuất bản lên web" dạng CSV chưa, và link trong phần CÀI ĐẶT có đúng link đó không.</div>'; });
+}
+})();
+</script>
+</body>
+</html>
