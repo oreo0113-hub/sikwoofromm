@@ -25,8 +25,8 @@ const CAI_DAT = {
 
   // Tên hiển thị và ảnh đại diện (link ảnh Drive hoặc link ảnh bất kỳ).
   // Để trống "" thì hiện chữ cái đầu.
-  yoonsik: { ten: "김윤식", tenViet: "Yoonsik", anh: "" },
-  syu:     { ten: "박시우", tenViet: "Syu",     anh: "" },
+  yoonsik: { ten: "김윤식", tenViet: "Yoonsik", anh: "yoonsik.jpg" },
+  syu:     { ten: "박시우", tenViet: "Syu",     anh: "syu.jpg" },
 
   // Giờ hiển thị kiểu Fromm "PM 4:40" (true) hay "16:40" (false)
   gioKieuFromm: true
@@ -247,8 +247,9 @@ const fmtDay = d => new Date(d+"T00:00:00").toLocaleDateString("vi-VN",{weekday:
 
 function avatar(p){
   const info = p=="ys"?CAI_DAT.yoonsik:CAI_DAT.syu;
-  if(info.anh){ const i=document.createElement("img"); i.className="avatar"; i.src=imgSrc(info.anh); i.alt=info.tenViet; return i; }
-  const d=document.createElement("div"); d.className="avatar"; d.textContent=info.tenViet[0]; d.setAttribute("aria-hidden","true"); return d;
+  const d=document.createElement("div"); d.className="avatar"; d.textContent=info.tenViet[0]; d.setAttribute("aria-hidden","true");
+  if(info.anh){ const i=document.createElement("img"); i.className="avatar"; i.src=imgSrc(info.anh); i.alt=info.tenViet; i.onerror=()=>i.replaceWith(d); return i; }
+  return d;
 }
 
 function render(){
